@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VideoStream.Application;
+using VideoStream.Infrastructure;
 
 namespace Presentation;
 
@@ -23,8 +25,8 @@ public class Startup
         // Application services
         services.AddApplication();
 
-        // Infrastructure services (to be added next)
-        // services.AddInfrastructure(Configuration);
+        // Infrastructure services
+        services.AddInfrastructure(Configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
