@@ -28,24 +28,19 @@ public class VideoController : ControllerBase
 
     [HttpPost]
     [DisableRequestSizeLimit]
-    public async Task<ActionResult> Upload(
-        [FromForm] string title,
-        [FromForm] int channelId,
-        [FromForm] string? description,
-        [FromForm] string? tags,
-        [FromForm(Name = "file")] IFormFile file)
+    public async Task<ActionResult> Upload([FromBody] UploadVideoRequest request)
     {
-        if (file == null || file.Length == 0)
+        if (request.File == null || request.File.Length == 0)
             return BadRequest("Video file is required");
 
         var dto = new VideoUploadDto
         {
-            Title = title,
-            ChannelId = channelId,
-            Description = description ?? string.Empty,
-            Tags = tags ?? string.Empty,
-            VideoStream = file.OpenReadStream(),
-            Subtitles = new Dictionary<string, Stream>()
+            Title = request.Title,
+            ChannelId = request.ChannelId,
+            Description = request.Description ?? string.Empty,
+            Tags = request.Tags ?? string.Empty,
+            VideoStream = request.File.OpenReadStream(),
+            Subtitles = request.Subtitles?.ToDictionary(kv => kv.Key, kv => (Stream)kv.Value.OpenReadStream()) ?? new Dictionary<string, Stream>()
         };
 
         var result = await _uploadVideo.ExecuteAsync(dto);

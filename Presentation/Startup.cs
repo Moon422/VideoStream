@@ -23,6 +23,7 @@ public class Startup
     {
         services.AddControllers();
         services.AddOpenApi();
+        services.AddSwaggerGen();
 
         services.AddMemoryCache();
 
@@ -40,6 +41,8 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         app.UseRouting();
