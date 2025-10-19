@@ -23,6 +23,9 @@ public class Video : BaseEntity, ICreationLogged, IModificationLogged, ISoftDele
     [Required, MaxLength(1024)]
     public string FilePath { get; set; } = string.Empty;
 
+    [Required, MaxLength(40)]
+    public string FileName { get; set; } = string.Empty;
+
     [MaxLength(1024)]
     public string HlsMasterPlaylistPath { get; set; } = string.Empty;
 
