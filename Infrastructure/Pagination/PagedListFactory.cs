@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using VideoStream.Domain;
 using VideoStream.Domain.Interfaces;
 
-namespace VideoStream.Infrastructure;
+namespace VideoStream.Infrastructure.Pagination;
 
 public class PagedListFactory : IPagedListFactory
 {

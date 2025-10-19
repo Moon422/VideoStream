@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using VideoStream.Domain;
 using VideoStream.Domain.Entities;
 
-namespace VideoStream.Infrastructure;
+namespace VideoStream.Infrastructure.Pagination;
 
 public static class PagedListHelper
 {

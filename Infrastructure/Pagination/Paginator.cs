@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using VideoStream.Domain;
 using VideoStream.Domain.Interfaces;
 
-namespace VideoStream.Infrastructure;
+namespace VideoStream.Infrastructure.Pagination;
 
 public class Paginator : IPaginator
 {
