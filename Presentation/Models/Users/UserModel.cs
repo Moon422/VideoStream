@@ -2,7 +2,7 @@ using System;
 
 namespace VideoStream.Presentation.Models.Users;
 
-public record UserReadModel : BaseEntityModel
+public record UserModel : BaseEntityModel
 {
     public string Firstname { get; set; }
     public string Lastname { get; set; }

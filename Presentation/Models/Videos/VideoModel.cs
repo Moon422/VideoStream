@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VideoStream.Presentation.Models.Videos;
 
-public record VideoReadModel : BaseEntityModel
+public record VideoModel : BaseEntityModel
 {
     public string Title { get; set; }
     public string Description { get; set; }

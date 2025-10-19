@@ -28,7 +28,7 @@ public class UserController : ControllerBase
         if (entity == null)
             return NotFound();
 
-        var userModel = new UserReadModel
+        var userModel = new UserModel
         {
             Id = entity.Id,
             Firstname = entity.Firstname,
@@ -56,7 +56,7 @@ public class UserController : ControllerBase
         };
         var userDto = await _createUserUseCase.ExecuteAsync(userCreateDto);
 
-        var userModel = new UserReadModel
+        var userModel = new UserModel
         {
             Id = userDto.Id,
             Firstname = userDto.Firstname,

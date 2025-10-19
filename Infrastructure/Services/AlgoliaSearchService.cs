@@ -46,6 +46,6 @@ public class AlgoliaSearchService : ISearchService
     {
         _logger.LogInformation("Search requested: {Query}", query);
         // Placeholder: return empty results
-        return Task.FromResult(_pagedListFactory.Create<BaseEntity>(new List<BaseEntity>(), 0, page, pageSize));
+        return Task.FromResult(_pagedListFactory.Create(new List<BaseEntity>(), 0, page, pageSize));
     }
 }
