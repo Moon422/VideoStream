@@ -6,5 +6,5 @@ namespace VideoStream.Domain.Interfaces;
 
 public interface IVideoRepository : IRepository<Video>
 {
-    Task<IPagedList<Video>> GetByChannelIdAsync(int channedlId, int page = 0, int pageSize = int.MaxValue);
+    Task<IPagedList<Video>> GetByChannelIdAsync(int channelId, int page = 0, int pageSize = int.MaxValue);
 }

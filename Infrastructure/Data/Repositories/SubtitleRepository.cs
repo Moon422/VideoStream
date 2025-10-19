@@ -21,7 +21,7 @@ public class SubtitleRepository : BaseRepository<Subtitle>, ISubtitleRepository
     {
         if (videoId <= 0)
         {
-            throw new ArgumentNullException("Video Id should be positive number.");
+            throw new ArgumentOutOfRangeException(nameof(videoId), "Video Id must be positive.");
         }
 
         ArgumentException.ThrowIfNullOrWhiteSpace(language);
@@ -33,7 +33,7 @@ public class SubtitleRepository : BaseRepository<Subtitle>, ISubtitleRepository
     {
         if (videoId <= 0)
         {
-            throw new ArgumentNullException("Video Id should be positive number.");
+            throw new ArgumentOutOfRangeException(nameof(videoId), "Video Id must be positive.");
         }
 
         var query = _db.Subtitles.AsNoTracking().Where(s => s.VideoId == videoId).OrderBy(s => s.Language);

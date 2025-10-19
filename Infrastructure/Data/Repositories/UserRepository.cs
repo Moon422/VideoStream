@@ -28,7 +28,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
         if (userId <= 0)
         {
-            throw new ArgumentNullException("User Id should be positive number.");
+            throw new ArgumentOutOfRangeException(nameof(userId), "User Id must be positive.");
         }
 
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);

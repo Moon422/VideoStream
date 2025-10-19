@@ -17,14 +17,14 @@ public class VideoRepository : BaseRepository<Video>, IVideoRepository
         _paginator = paginator;
     }
 
-    public async Task<IPagedList<Video>> GetByChannelIdAsync(int channedlId, int page = 0, int pageSize = int.MaxValue)
+    public async Task<IPagedList<Video>> GetByChannelIdAsync(int channelId, int page = 0, int pageSize = int.MaxValue)
     {
-        if (channedlId <= 0)
+        if (channelId <= 0)
         {
-            throw new ArgumentNullException("Channel Id should be positive number.");
+            throw new ArgumentOutOfRangeException(nameof(channelId), "Channel Id must be positive.");
         }
 
-        var query = _db.Videos.AsNoTracking().Where(v => v.ChannelId == channedlId).OrderByDescending(v => v.CreatedOn);
+        var query = _db.Videos.AsNoTracking().Where(v => v.ChannelId == channelId).OrderByDescending(v => v.CreatedOn);
         return await _paginator.PaginateAsync(query, page, pageSize);
     }
 }

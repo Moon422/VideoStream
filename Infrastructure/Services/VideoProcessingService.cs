@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using VideoStream.Application.Interfaces;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
-using VideoStream.Infrastructure.Data;
 using VideoStream.Infrastructure.Storage;
 
 namespace VideoStream.Infrastructure.Services;

@@ -31,7 +31,7 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         if (id <= 0)
         {
-            throw new ArgumentNullException("Id should be positive number.");
+            throw new ArgumentOutOfRangeException(nameof(id), "Id must be positive.");
         }
 
         return await _db.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
@@ -55,7 +55,7 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         if (id <= 0)
         {
-            throw new ArgumentNullException("Id should be positive number.");
+            throw new ArgumentOutOfRangeException(nameof(id), "Id must be positive.");
         }
 
         return _db.Set<T>().AnyAsync(e => e.Id == id);
