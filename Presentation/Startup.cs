@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 using VideoStream.Application;
 using VideoStream.Application.Interfaces;
 using VideoStream.Infrastructure;
+using VideoStream.Infrastructure.Data;
 using VideoStream.Presentation.Caching;
 
 namespace VideoStream.Presentation;
@@ -28,6 +30,10 @@ public class Startup
         services.AddMemoryCache();
 
         services.AddScoped<ICacheManager, CacheManager>();
+
+        // SQLite DbContext
+        var connectionString = Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=app.db";
+        services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 
         // Application services
         services.AddApplication();
