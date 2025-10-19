@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,11 @@ public class VideoRepository : BaseRepository<Video>, IVideoRepository
 
     public async Task<IPagedList<Video>> GetByChannelIdAsync(int channedlId, int page = 0, int pageSize = int.MaxValue)
     {
+        if (channedlId <= 0)
+        {
+            throw new ArgumentNullException("Channel Id should be positive number.");
+        }
+
         var query = _db.Videos.AsNoTracking().Where(v => v.ChannelId == channedlId).OrderByDescending(v => v.CreatedOn);
         return await _paginator.PaginateAsync(query, page, pageSize);
     }

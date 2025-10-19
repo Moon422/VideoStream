@@ -30,11 +30,6 @@ public class AppDbContext : DbContext
             .WithMany(v => v.Subtitles)
             .HasForeignKey(s => s.VideoId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Soft-delete query filters
-        modelBuilder.Entity<User>().HasQueryFilter(e => !e.Deleted);
-        modelBuilder.Entity<Channel>().HasQueryFilter(e => !e.Deleted);
-        modelBuilder.Entity<Video>().HasQueryFilter(e => !e.Deleted);
     }
 
     public override int SaveChanges()

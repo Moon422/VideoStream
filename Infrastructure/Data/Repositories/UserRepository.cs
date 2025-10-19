@@ -11,15 +11,30 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     public UserRepository(AppDbContext db, IPaginator paginator) : base(db, paginator) { }
 
     public async Task<User?> GetByEmailAsync(string email)
-        => await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(email);
+
+        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+    }
 
     public async Task<User?> GetByUsernameAsync(string username)
-        => await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
-
-    public async Task IsAdminAsync(int userId)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(username);
+
+        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
+    }
+
+    public async Task<bool> IsAdminAsync(int userId)
+    {
+        if (userId <= 0)
+        {
+            throw new ArgumentNullException("User Id should be positive number.");
+        }
+
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null || !user.IsAdmin)
-            throw new UnauthorizedAccessException("Admin privileges required");
+        if (user is null || !user.IsAdmin)
+            return false;
+
+        return true;
     }
 }

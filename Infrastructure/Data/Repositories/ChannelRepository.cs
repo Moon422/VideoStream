@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
 

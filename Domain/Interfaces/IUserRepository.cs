@@ -7,5 +7,5 @@ public interface IUserRepository : IRepository<User>
 {
     Task<User?> GetByEmailAsync(string email);
     Task<User?> GetByUsernameAsync(string username);
-    Task IsAdminAsync(int userId);
+    Task<bool> IsAdminAsync(int userId);
 }
