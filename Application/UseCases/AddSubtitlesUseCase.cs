@@ -15,6 +15,6 @@ public class AddSubtitlesUseCase
 
     public async Task ExecuteAsync(AddSubtitlesDto request)
     {
-        await _videoProcessingService.AddSubtitlesAsync(request.VideoId, request.subtitles);
+        await _videoProcessingService.AddSubtitlesAsync(request.VideoId, request.Subtitles);
     }
 }

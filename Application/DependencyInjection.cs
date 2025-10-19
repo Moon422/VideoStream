@@ -9,6 +9,8 @@ public static class DependencyInjection
     {
         // Use cases
         services.AddScoped<AddVideoUseCase>();
+        services.AddScoped<AddSubtitlesUseCase>();
+        services.AddScoped<UploadVideoUseCase>();
         services.AddScoped<SearchVideosUseCase>();
         services.AddScoped<CreateUserUseCase>();
 

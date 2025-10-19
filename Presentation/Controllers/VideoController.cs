@@ -19,15 +19,18 @@ public class VideoController : ControllerBase
 {
     private readonly AddVideoUseCase _addVideo;
     private readonly UploadVideoUseCase _uploadVideo;
+    private readonly AddSubtitlesUseCase _addSubtitlesUseCase;
     private readonly IVideoRepository _videos;
 
     public VideoController(AddVideoUseCase addVideo,
         UploadVideoUseCase uploadVideo,
-        IVideoRepository videos)
+        IVideoRepository videos,
+        AddSubtitlesUseCase addSubtitlesUseCase)
     {
         _addVideo = addVideo;
         _videos = videos;
         _uploadVideo = uploadVideo;
+        _addSubtitlesUseCase = addSubtitlesUseCase;
     }
 
     [HttpPost("information")]
@@ -45,7 +48,7 @@ public class VideoController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    [HttpPost("upload/{id:int}")]
+    [HttpPost("{id:int}/upload")]
     public async Task<IActionResult> UploadVideo(int id, IFormFile formFile)
     {
         if (formFile is null || formFile.Length <= 0)
@@ -60,6 +63,31 @@ public class VideoController : ControllerBase
         });
 
         return Ok("Video uploaded");
+    }
+
+    [HttpPost("{id:int}/upload-subtitles")]
+    public async Task<IActionResult> UploadSubtitles(int id, IList<IFormFile> formFiles)
+    {
+        formFiles = formFiles.Where(file => file is not null && file.Length > 0).ToList();
+        if (formFiles is null || !formFiles.Any())
+        {
+            return BadRequest("Subtitle file(s) are required.");
+        }
+
+        var subtitles = new Dictionary<string, Stream>();
+        foreach (var file in formFiles)
+        {
+            var filenameWithoutExt = string.Join("", file.FileName.Split('.')[..^1]);
+            subtitles.Add(filenameWithoutExt, file.OpenReadStream());
+        }
+
+        await _addSubtitlesUseCase.ExecuteAsync(new AddSubtitlesDto
+        {
+            VideoId = id,
+            Subtitles = subtitles
+        });
+
+        return Ok();
     }
 
     [HttpGet("{id:int}")]
