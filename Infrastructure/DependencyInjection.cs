@@ -38,7 +38,7 @@ public static class DependencyInjection
 
         // Storage
         var storageRoot = configuration["Storage:Root"] ?? Path.Combine(AppContext.BaseDirectory, "storage");
-        services.AddSingleton<LocalFileStorageService>(sp =>
+        services.AddSingleton(sp =>
         {
             var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LocalFileStorageService>>();
             return new LocalFileStorageService(logger, storageRoot);

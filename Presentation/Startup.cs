@@ -4,7 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VideoStream.Application;
+using VideoStream.Application.Interfaces;
 using VideoStream.Infrastructure;
+using VideoStream.Presentation.Caching;
 
 namespace VideoStream.Presentation;
 
@@ -21,6 +23,10 @@ public class Startup
     {
         services.AddControllers();
         services.AddOpenApi();
+
+        services.AddMemoryCache();
+
+        services.AddScoped<ICacheManager, CacheManager>();
 
         // Application services
         services.AddApplication();
