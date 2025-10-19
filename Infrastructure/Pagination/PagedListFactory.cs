@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using VideoStream.Domain;
+using VideoStream.Domain.Pagination;
 using VideoStream.Domain.Interfaces;
 
 namespace VideoStream.Infrastructure.Pagination;

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using VideoStream.Domain;
+using VideoStream.Domain.Pagination;
 
 namespace VideoStream.Infrastructure.Pagination;
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VideoStream.Domain.Entities;
+using VideoStream.Domain.Pagination;
 
 namespace VideoStream.Domain.Interfaces;
 

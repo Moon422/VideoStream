@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using VideoStream.Application.DTOs;
-using VideoStream.Domain;
+using VideoStream.Domain.Pagination;
 
 namespace VideoStream.Application.Interfaces;
 

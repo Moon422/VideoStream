@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using VideoStream.Domain;
+using VideoStream.Domain.Pagination;
 using VideoStream.Domain.Entities;
 
 namespace VideoStream.Infrastructure.Pagination;

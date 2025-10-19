@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace VideoStream.Domain;
+namespace VideoStream.Domain.Pagination;
 
 public interface IPagedList<T> : IList<T>
 {

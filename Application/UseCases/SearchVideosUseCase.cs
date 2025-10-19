@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VideoStream.Application.DTOs;
-using VideoStream.Domain;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
+using VideoStream.Domain.Pagination;
 
 namespace VideoStream.Application.UseCases;
 
