@@ -3,7 +3,7 @@ using System.IO;
 
 namespace VideoStream.Application.DTOs;
 
-public class AddSubtitlesDto
+public class AddVideoSubtitlesDto
 {
     public int VideoId { get; set; }
     public IDictionary<string, Stream> Subtitles { get; set; }

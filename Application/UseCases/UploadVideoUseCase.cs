@@ -20,7 +20,7 @@ public class UploadVideoUseCase
         _videoRepository = videoRepository;
     }
 
-    public async Task ExecuteAsync(VideoUploadDto request)
+    public async Task ExecuteAsync(UploadVideoDto request)
     {
         var video = await _videoRepository.GetByIdAsync(request.VideoId);
         if (video is null)

@@ -6,7 +6,7 @@ namespace VideoStream.Application.Interfaces;
 
 public interface IVideoService
 {
-    Task<VideoDto> UploadAsync(VideoCreateDto dto);
+    Task<VideoDto> UploadAsync(AddVideoInformationDto dto);
     Task<VideoDto?> GetByIdAsync(int id);
     Task<IPagedList<VideoDto>> GetByChannelAsync(int channelId, int page = 0, int pageSize = 50);
 }

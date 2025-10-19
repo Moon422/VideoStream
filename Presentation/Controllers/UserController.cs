@@ -46,7 +46,7 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CreateUserRequest req)
     {
-        var userCreateDto = new UserCreateDto
+        var userCreateDto = new CreateUserDto
         {
             Firstname = req.Firstname,
             Lastname = req.Lastname,

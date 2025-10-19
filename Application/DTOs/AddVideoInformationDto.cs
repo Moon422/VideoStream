@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VideoStream.Application.DTOs;
 
-public class VideoCreateDto
+public class AddVideoInformationDto
 {
     [Required, MaxLength(200)]
     public string Title { get; set; } = string.Empty;

@@ -36,7 +36,7 @@ public class VideoController : ControllerBase
     [HttpPost("information")]
     public async Task<ActionResult> AddVideoInformation([FromBody] UploadVideoRequest request)
     {
-        var dto = new VideoCreateDto
+        var dto = new AddVideoInformationDto
         {
             Title = request.Title,
             ChannelId = request.ChannelId,
@@ -56,7 +56,7 @@ public class VideoController : ControllerBase
             return BadRequest("Video is required.");
         }
 
-        await _uploadVideo.ExecuteAsync(new VideoUploadDto
+        await _uploadVideo.ExecuteAsync(new UploadVideoDto
         {
             VideoId = id,
             VideoStream = formFile.OpenReadStream()
@@ -81,7 +81,7 @@ public class VideoController : ControllerBase
             subtitles.Add(filenameWithoutExt, file.OpenReadStream());
         }
 
-        await _addSubtitlesUseCase.ExecuteAsync(new AddSubtitlesDto
+        await _addSubtitlesUseCase.ExecuteAsync(new AddVideoSubtitlesDto
         {
             VideoId = id,
             Subtitles = subtitles

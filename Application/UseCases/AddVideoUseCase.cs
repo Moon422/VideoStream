@@ -15,7 +15,7 @@ public class AddVideoUseCase
         _videoRepository = videoRepository;
     }
 
-    public async Task<VideoDto> ExecuteAsync(VideoCreateDto request)
+    public async Task<VideoDto> ExecuteAsync(AddVideoInformationDto request)
     {
         var video = new Video
         {

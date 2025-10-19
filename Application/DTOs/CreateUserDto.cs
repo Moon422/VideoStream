@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VideoStream.Application.DTOs;
 
-public class UserCreateDto
+public class CreateUserDto
 {
     [MaxLength(100)]
     public string Firstname { get; set; }

@@ -14,7 +14,7 @@ public class CreateUserUseCase
         _userRepository = userRepository;
     }
 
-    public async Task<UserDto> ExecuteAsync(UserCreateDto request)
+    public async Task<UserDto> ExecuteAsync(CreateUserDto request)
     {
         var user = new User
         {
