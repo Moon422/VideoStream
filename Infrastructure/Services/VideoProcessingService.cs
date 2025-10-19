@@ -27,7 +27,7 @@ public class VideoProcessingService : IVideoProcessingService
         _storage = storage;
     }
 
-    public async Task EnqueueProcessingAsync(int videoId, Stream videoStream, Dictionary<string, Stream> subtitles)
+    public async Task EnqueueProcessingAsync(int videoId, Stream videoStream)
     {
         var video = await _videoRepository.GetByIdAsync(videoId)
             ?? throw new InvalidOperationException($"Video {videoId} not found");
@@ -39,7 +39,12 @@ public class VideoProcessingService : IVideoProcessingService
         video.Status = VideoStatus.Processing;
         await _videoRepository.UpdateAsync(video);
 
-        // Save subtitles
+        // In a real system, enqueue a background job to transcode and HLS package
+        _logger.LogInformation("Queued processing for video {VideoId}", videoId);
+    }
+
+    public async Task AddSubtitlesAsync(int videoId, IDictionary<string, Stream> subtitles)
+    {
         foreach (var kv in subtitles)
         {
             var lang = kv.Key;
@@ -52,8 +57,5 @@ public class VideoProcessingService : IVideoProcessingService
                 FilePath = subPath
             });
         }
-
-        // In a real system, enqueue a background job to transcode and HLS package
-        _logger.LogInformation("Queued processing for video {VideoId}", videoId);
     }
 }

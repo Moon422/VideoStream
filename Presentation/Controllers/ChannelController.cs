@@ -38,12 +38,12 @@ public class ChannelController : ControllerBase
         };
         await _channels.AddAsync(channel);
 
-        return CreatedAtAction(nameof(GetById), new ChannelReadModel
+        return CreatedAtAction(nameof(GetById), new { id = channel.Id }, new ChannelReadModel
         {
             Id = channel.Id,
             Name = channel.Name,
             Description = channel.Description,
             CreatedByUserId = channel.CreatedByUserId
-        }, channel);
+        });
     }
 }

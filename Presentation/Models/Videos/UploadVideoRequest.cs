@@ -11,8 +11,8 @@ public class UploadVideoRequest
     public string? Tags { get; set; }
 
     // Main video file
-    public IFormFile File { get; set; } = default!;
+    // public IFormFile File { get; set; } = default!;
 
     // Optional subtitles as multipart keys: Subtitles[en], Subtitles[fr], ...
-    public Dictionary<string, IFormFile>? Subtitles { get; set; }
+    // public Dictionary<string, IFormFile>? Subtitles { get; set; }
 }
