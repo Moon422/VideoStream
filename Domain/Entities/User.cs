@@ -20,7 +20,7 @@ public class User : BaseEntity, ICreationLogged, IModificationLogged, ISoftDelet
 
     public bool IsAdmin { get; set; }
 
-    [Required, MaxLength(512)]
+    [Required, MaxLength(60)]
     public string PasswordHash { get; set; } = string.Empty;
 
     [Required]
