@@ -19,6 +19,10 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<User>()
+            .Property(x => x.PasswordHash)
+            .IsFixedLength();
+
         modelBuilder.Entity<Video>()
             .HasOne(v => v.Channel)
             .WithMany(c => c.Videos)

@@ -19,8 +19,17 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // DbContext
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=app.db";
-        services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            var connectionString = configuration.GetConnectionString("mysql");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException();
+
+            var version = ServerVersion.AutoDetect(connectionString) ??
+                throw new InvalidOperationException();
+
+            options.UseMySql(connectionString, version);
+        });
 
         // Pagination
         services.AddScoped<IPagedListFactory, PagedListFactory>();

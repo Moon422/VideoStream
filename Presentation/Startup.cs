@@ -32,18 +32,6 @@ public class Startup
 
         services.AddScoped<ICacheManager, CacheManager>();
 
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            var connectionString = Configuration.GetConnectionString("mysql");
-            if (string.IsNullOrWhiteSpace(connectionString))
-                throw new InvalidOperationException();
-
-            var version = ServerVersion.AutoDetect(connectionString) ??
-                throw new InvalidOperationException();
-
-            options.UseMySql(connectionString, version);
-        });
-
         // Application services
         services.AddApplication();
 
