@@ -9,6 +9,7 @@ using VideoStream.Application.Interfaces;
 using VideoStream.Infrastructure;
 using VideoStream.Infrastructure.Data;
 using VideoStream.Presentation.Caching;
+using System;
 
 namespace VideoStream.Presentation;
 
@@ -31,9 +32,17 @@ public class Startup
 
         services.AddScoped<ICacheManager, CacheManager>();
 
-        // SQLite DbContext
-        var connectionString = Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=app.db";
-        services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            var connectionString = Configuration.GetConnectionString("mysql");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException();
+
+            var version = ServerVersion.AutoDetect(connectionString) ??
+                throw new InvalidOperationException();
+
+            options.UseMySql(connectionString, version);
+        });
 
         // Application services
         services.AddApplication();
