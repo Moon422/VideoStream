@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using VideoStream.Application.Events;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
 
@@ -8,7 +9,12 @@ namespace VideoStream.Infrastructure.Data.Repositories;
 
 public class UserRepository : BaseRepository<User>, IUserRepository
 {
-    public UserRepository(AppDbContext db, IPaginator paginator) : base(db, paginator) { }
+    public UserRepository(AppDbContext db,
+        IPaginator paginator,
+        IEventPublisher eventPublisher) : base(db,
+            paginator,
+            eventPublisher)
+    { }
 
     public async Task<User?> GetByEmailAsync(string email)
     {

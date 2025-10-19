@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using VideoStream.Application.Events;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
 using VideoStream.Domain.Pagination;
@@ -12,7 +13,11 @@ public class VideoRepository : BaseRepository<Video>, IVideoRepository
 {
     private readonly IPaginator _paginator;
 
-    public VideoRepository(AppDbContext db, IPaginator paginator) : base(db, paginator)
+    public VideoRepository(AppDbContext db,
+        IPaginator paginator,
+        IEventPublisher eventPublisher) : base(db,
+            paginator,
+            eventPublisher)
     {
         _paginator = paginator;
     }
