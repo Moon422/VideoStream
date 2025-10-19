@@ -1,9 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using VideoStream.Domain;
 using VideoStream.Domain.Entities;
 
-namespace VideoStream.Domain;
+namespace VideoStream.Infrastructure;
 
 public static class PagedListHelper
 {

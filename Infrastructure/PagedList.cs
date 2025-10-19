@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using VideoStream.Domain;
 
-namespace VideoStream.Domain;
+namespace VideoStream.Infrastructure;
 
 public class PagedList<T> : List<T>, IPagedList<T>
 {
