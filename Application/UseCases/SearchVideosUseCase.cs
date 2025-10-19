@@ -10,10 +10,12 @@ namespace VideoStream.Application.UseCases;
 public class SearchVideosUseCase
 {
     private readonly ISearchService _searchService;
+    private readonly IPagedListFactory _pagedListFactory;
 
-    public SearchVideosUseCase(ISearchService searchService)
+    public SearchVideosUseCase(ISearchService searchService, IPagedListFactory pagedListFactory)
     {
         _searchService = searchService;
+        _pagedListFactory = pagedListFactory;
     }
 
     public async Task<IPagedList<SearchResultDto>> ExecuteAsync(string query, int page = 0, int pageSize = 50)
@@ -44,6 +46,6 @@ public class SearchVideosUseCase
                     break;
             }
         }
-        return new PagedList<SearchResultDto>(mapped, results.TotalItems, results.PageIndex, results.PageSize);
+        return _pagedListFactory.Create(mapped, results.TotalItems, results.PageIndex, results.PageSize);
     }
 }
