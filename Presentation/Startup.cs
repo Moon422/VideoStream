@@ -19,9 +19,12 @@ public class Startup
     {
         services.AddControllers();
         services.AddOpenApi();
-        // TODO: register Application/Infrastructure services via extension methods
+
+        // Application services
+        services.AddApplication();
+
+        // Infrastructure services (to be added next)
         // services.AddInfrastructure(Configuration);
-        // services.AddApplication();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
