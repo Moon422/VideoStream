@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using VideoStream.Application;
 using VideoStream.Infrastructure;
 
-namespace Presentation;
+namespace VideoStream.Presentation;
 
 public class Startup
 {

@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 
-namespace Presentation.Models;
+namespace VideoStream.Presentation.Models;
 
-public class PagedResponse<T>
+public record PagedResponse<T> where T : BaseModel
 {
-    public IReadOnlyList<T> Items { get; set; } = Array.Empty<T>();
+    public IReadOnlyList<T> Items { get; set; } = [];
     public int PageIndex { get; set; }
     public int PageSize { get; set; }
     public int TotalItems { get; set; }

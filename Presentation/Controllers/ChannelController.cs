@@ -3,16 +3,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
+using VideoStream.Presentation.Models.Channels;
 
-namespace Presentation.Controllers;
+namespace VideoStream.Presentation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ChannelsController : ControllerBase
+public class ChannelController : ControllerBase
 {
     private readonly IChannelRepository _channels;
 
-    public ChannelsController(IChannelRepository channels)
+    public ChannelController(IChannelRepository channels)
     {
         _channels = channels;
     }
@@ -25,12 +26,9 @@ public class ChannelsController : ControllerBase
         return Ok(entity);
     }
 
-    public record CreateChannelRequest(string Name, string? Description, int CreatedByUserId);
-
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CreateChannelRequest req)
     {
-        if (string.IsNullOrWhiteSpace(req.Name)) return BadRequest("Name is required");
         var channel = new Channel
         {
             Name = req.Name,
@@ -39,6 +37,13 @@ public class ChannelsController : ControllerBase
             CreatedOn = DateTime.UtcNow
         };
         await _channels.AddAsync(channel);
-        return CreatedAtAction(nameof(GetById), new { id = channel.Id }, channel);
+
+        return CreatedAtAction(nameof(GetById), new ChannelReadModel
+        {
+            Id = channel.Id,
+            Name = channel.Name,
+            Description = channel.Description,
+            CreatedByUserId = channel.CreatedByUserId
+        }, channel);
     }
 }

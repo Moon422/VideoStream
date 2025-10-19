@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Models;
 using VideoStream.Application.UseCases;
-using VideoStream.Domain.Pagination;
+using VideoStream.Presentation.Models;
+using VideoStream.Presentation.Models.Search;
 
-namespace Presentation.Controllers;
+namespace VideoStream.Presentation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -19,13 +19,19 @@ public class SearchController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedResponse<object>>> Search([FromQuery] string q, [FromQuery] int page = 0, [FromQuery] int pageSize = 20)
+    public async Task<ActionResult<PagedResponse<SearchResult>>> Search([FromQuery] SearchCommand command)
     {
-        if (string.IsNullOrWhiteSpace(q)) return BadRequest("Query is required");
-        var results = await _search.ExecuteAsync(q, page, pageSize);
-        var response = new PagedResponse<object>
+        if (string.IsNullOrWhiteSpace(command.Query)) return BadRequest("Query is required");
+        var results = await _search.ExecuteAsync(command.Query, command.PageIndex, command.PageSize);
+        var response = new PagedResponse<SearchResult>
         {
-            Items = results.Select(r => (object)r).ToList(),
+            Items = results.Select(r => new SearchResult
+            {
+                EntityType = r.Title,
+                Id = r.Id,
+                Title = r.Title,
+                Description = r.Description
+            }).ToList(),
             PageIndex = results.PageIndex,
             PageSize = results.PageSize,
             TotalItems = results.TotalItems,

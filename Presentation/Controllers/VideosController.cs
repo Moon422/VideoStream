@@ -4,23 +4,23 @@ using VideoStream.Application.DTOs;
 using VideoStream.Application.UseCases;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
-using VideoStream.Domain.Pagination;
-using Presentation.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VideoStream.Presentation.Models.Videos;
+using VideoStream.Presentation.Models;
 
-namespace Presentation.Controllers;
+namespace VideoStream.Presentation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class VideosController : ControllerBase
+public class VideoController : ControllerBase
 {
     private readonly UploadVideoUseCase _uploadVideo;
     private readonly IVideoRepository _videos;
 
-    public VideosController(UploadVideoUseCase uploadVideo, IVideoRepository videos)
+    public VideoController(UploadVideoUseCase uploadVideo, IVideoRepository videos)
     {
         _uploadVideo = uploadVideo;
         _videos = videos;
@@ -28,7 +28,7 @@ public class VideosController : ControllerBase
 
     [HttpPost]
     [DisableRequestSizeLimit]
-    public async Task<ActionResult<VideoDto>> Upload(
+    public async Task<ActionResult> Upload(
         [FromForm] string title,
         [FromForm] int channelId,
         [FromForm] string? description,
@@ -53,19 +53,21 @@ public class VideosController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<VideoDto>> GetById(int id)
+    public async Task<ActionResult> GetById(int id)
     {
         var entity = await _videos.GetByIdAsync(id);
-        if (entity == null) return NotFound();
+        if (entity == null)
+            return NotFound();
+
         var dto = Map(entity);
         return Ok(dto);
     }
 
     [HttpGet("by-channel/{channelId:int}")]
-    public async Task<ActionResult<PagedResponse<VideoDto>>> GetByChannel(int channelId, [FromQuery] int page = 0, [FromQuery] int pageSize = 20)
+    public async Task<ActionResult> GetByChannel(int channelId, [FromQuery] int page = 0, [FromQuery] int pageSize = 20)
     {
         var paged = await _videos.GetByChannelIdAsync(channelId, page, pageSize);
-        var dto = new PagedResponse<VideoDto>
+        var dto = new PagedResponse<VideoOverviewModel>
         {
             Items = paged.Select(Map).ToList(),
             PageIndex = paged.PageIndex,
@@ -76,17 +78,13 @@ public class VideosController : ControllerBase
         return Ok(dto);
     }
 
-    private static VideoDto Map(Video v) => new()
+    private static VideoOverviewModel Map(Video v) => new()
     {
         Id = v.Id,
         Title = v.Title,
         Description = v.Description,
         Tags = v.Tags,
         ChannelId = v.ChannelId,
-        FilePath = v.FilePath,
-        HlsMasterPlaylistPath = v.HlsMasterPlaylistPath,
-        ThumbnailPath = v.ThumbnailPath,
-        Status = v.Status.ToString(),
-        CreatedOn = v.CreatedOn
+        ThumbnailPath = v.ThumbnailPath
     };
 }
