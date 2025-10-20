@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using VideoStream.Domain.Entities;
 
 namespace VideoStream.Application.DTOs;
 
@@ -24,4 +25,24 @@ public class VideoDto
     public string Status { get; set; } = string.Empty;
 
     public DateTime CreatedOn { get; set; }
+}
+
+public static class VideoToVideoDtoHelper
+{
+    public static VideoDto ToVideoDto(this Video video)
+    {
+        return new VideoDto
+        {
+            Id = video.Id,
+            Title = video.Title,
+            Description = video.Description,
+            Tags = video.Tags,
+            ChannelId = video.ChannelId,
+            FilePath = video.FilePath,
+            HlsMasterPlaylistPath = video.HlsMasterPlaylistPath,
+            ThumbnailPath = video.ThumbnailPath,
+            Status = video.Status.ToString(),
+            CreatedOn = video.CreatedOn
+        };
+    }
 }

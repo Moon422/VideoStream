@@ -7,7 +7,7 @@ using VideoStream.Domain.Entities;
 
 namespace VideoStream.Application.DTOs;
 
-public class AddVideoSubtitlesDto
+public class UploadVideoSubtitlesDto
 {
     public int VideoId { get; set; }
     public IDictionary<string, Stream> Subtitles { get; set; }

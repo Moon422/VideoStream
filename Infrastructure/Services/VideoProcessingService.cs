@@ -154,20 +154,4 @@ public class VideoProcessingService : IVideoProcessingService
             await _videoRepository.UpdateAsync(video);
         }
     }
-
-    public async Task AddSubtitlesAsync(int videoId, IDictionary<string, Stream> subtitles)
-    {
-        foreach (var kv in subtitles)
-        {
-            var lang = kv.Key;
-            var subStream = kv.Value;
-            var subPath = await _storage.SaveSubtitleAsync(videoId, lang, subStream);
-            await _subtitleRepository.AddAsync(new Subtitle
-            {
-                VideoId = videoId,
-                Language = lang,
-                FilePath = subPath
-            });
-        }
-    }
 }

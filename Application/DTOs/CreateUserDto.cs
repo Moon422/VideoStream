@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using VideoStream.Domain.Entities;
 
 namespace VideoStream.Application.DTOs;
 
@@ -20,4 +21,16 @@ public class CreateUserDto
     [MinLength(6)]
     [MaxLength(20)]
     public string Password { get; set; }
+
+    public User ToUser()
+    {
+        return new User
+        {
+            Firstname = Firstname,
+            Lastname = Lastname,
+            Username = Username,
+            Email = Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password)
+        };
+    }
 }

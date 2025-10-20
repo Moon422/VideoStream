@@ -41,7 +41,7 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         return query.OfType<ISoftDeleted>().Where(entry => !entry.Deleted).OfType<T>();
     }
 
-    public virtual async Task AddAsync(T entity, bool publishEvent = true)
+    public virtual async Task<T> AddAsync(T entity, bool publishEvent = true)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -52,6 +52,8 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         {
             await _eventPublisher.EntityInsertedAsync(entity);
         }
+
+        return entity;
     }
 
     public virtual async Task<T?> GetByIdAsync(int id)

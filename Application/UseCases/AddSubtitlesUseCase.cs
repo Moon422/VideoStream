@@ -1,20 +1,27 @@
 using System.Threading.Tasks;
 using VideoStream.Application.DTOs;
+using VideoStream.Application.Interfaces;
 using VideoStream.Domain.Interfaces;
 
 namespace VideoStream.Application.UseCases;
 
 public class AddSubtitlesUseCase
 {
-    private readonly IVideoProcessingService _videoProcessingService;
+    private readonly ISubtitleRepository _subtitleRepository;
+    private readonly ILocalFileStorageService _localFileStorageService;
 
-    public AddSubtitlesUseCase(IVideoProcessingService videoProcessingService)
+    public AddSubtitlesUseCase(ISubtitleRepository subtitleRepository,
+        ILocalFileStorageService localFileStorageService)
     {
-        _videoProcessingService = videoProcessingService;
+        _subtitleRepository = subtitleRepository;
+        _localFileStorageService = localFileStorageService;
     }
 
-    public async Task ExecuteAsync(AddVideoSubtitlesDto request)
+    public async Task ExecuteAsync(UploadVideoSubtitlesDto request)
     {
-        await _videoProcessingService.AddSubtitlesAsync(request.VideoId, request.Subtitles);
+        foreach (var subtitle in await request.ToSubtitleList(_localFileStorageService))
+        {
+            await _subtitleRepository.AddAsync(subtitle);
+        }
     }
 }
