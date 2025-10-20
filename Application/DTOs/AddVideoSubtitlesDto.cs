@@ -14,13 +14,12 @@ public class AddVideoSubtitlesDto
 
     public async Task<IList<Subtitle>> ToSubtitleList(ILocalFileStorageService localFileStorageService)
     {
-        // return Subtitles.Select(kv => new Subtitle
-        // {
-        //     Language = kv.Key,
-        //     VideoId = VideoId,
-        //     FilePath = await localFileStorageService.SaveSubtitleAsync(VideoId, kv.Key, kv.Value)
-        // }).;
-
-        return Subtitles.Select()
+        return await Subtitles.ToAsyncEnumerable()
+            .SelectAwait(async kv => new Subtitle
+            {
+                Language = kv.Key,
+                VideoId = VideoId,
+                FilePath = await localFileStorageService.SaveSubtitleAsync(VideoId, kv.Key, kv.Value)
+            }).ToListAsync();
     }
 }
