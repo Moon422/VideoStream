@@ -56,6 +56,13 @@ public class VideoController : ControllerBase
             return BadRequest("Video is required.");
         }
 
+        var extension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+        if (extension != ".mp4")
+            return BadRequest("Only .mp4 files are allowed.");
+
+        if (formFile.ContentType != "video/mp4")
+            return BadRequest("Invalid file type. Expected video/mp4.");
+
         await _uploadVideo.ExecuteAsync(new UploadVideoDto
         {
             VideoId = id,

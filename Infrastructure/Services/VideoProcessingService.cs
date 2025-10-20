@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using FFMpegCore;
 using FFMpegCore.Enums;
@@ -39,13 +40,13 @@ public class VideoProcessingService : IVideoProcessingService
 
         _logger.LogInformation("Resizing video file: {0} to {1}p", Path.GetFileName(filepath), targetHeight);
 
-        int targetWidth = (int)((float)width / targetHeight * height);
+        int targetWidth = (int)((float)width / height * targetHeight);
         if (targetWidth % 2 != 0)
             targetWidth++;
 
         var directory = Path.GetDirectoryName(filepath);
         var fileExt = Path.GetExtension(filepath);
-        var targetPath = Path.Join(directory, $"{targetWidth}_{targetHeight}.{fileExt}");
+        var targetPath = Path.Join(directory, $"{targetWidth}_{targetHeight}.{fileExt.TrimStart('.')}");
 
         await FFMpegArguments.FromFileInput(filepath)
             .OutputToFile(targetPath, false, options => options
@@ -63,32 +64,31 @@ public class VideoProcessingService : IVideoProcessingService
         return targetPath;
     }
 
-    private async Task SegmentVideoToHlsAsync(string? filepath, int videoId)
+    private async Task<string?> SegmentVideoToHlsAsync(string? filepath)
     {
-        if (string.IsNullOrWhiteSpace(filepath)) return;
+        if (string.IsNullOrWhiteSpace(filepath)) return null;
 
         _logger.LogInformation("Segmenting video file: {0}", Path.GetFileName(filepath));
 
         var filename = Path.GetFileNameWithoutExtension(filepath);
-        var rootDirectory = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(filepath)));
-        var outputDirectory = Path.Join(rootDirectory, "hls", videoId.ToString(), filename);
+        var outputDirectory = Path.Join(Path.GetDirectoryName(filepath), filename);
         Directory.CreateDirectory(outputDirectory);
-
-        var masterPlaylistPath = Path.Join(outputDirectory, "master.m3u8");
+        var indexPlaylistPath = Path.Join(outputDirectory, $"index.m3u8");
 
         await FFMpegArguments.FromFileInput(filepath)
-            .OutputToFile(masterPlaylistPath, overwrite: true, options => options
+            .OutputToFile(indexPlaylistPath, true, options => options
                 .ForceFormat("hls")
                 .WithCustomArgument("-hls_time 10")
                 .WithCustomArgument("-hls_list_size 0")
                 .WithCopyCodec()
-                .WithCustomArgument("filename.m3u8"))
-            .ProcessAsynchronously();
+            ).ProcessAsynchronously();
 
         _logger.LogInformation("Segmented video file: {0}", Path.GetFileName(filepath));
+
+        return indexPlaylistPath;
     }
 
-    private async Task ProcessVideoAsync(string filepath, int videoId)
+    private async Task<string?> ProcessVideoAsync(string filepath)
     {
         _logger.LogInformation("Processing video file: {0}", Path.GetFileName(filepath));
 
@@ -98,16 +98,36 @@ public class VideoProcessingService : IVideoProcessingService
 
         if (width < 0 || height < 0)
         {
-            return;
+            return null;
         }
+
+        var masterPlaylistContent = new StringBuilder();
+        masterPlaylistContent.AppendLine("#EXTM3U");
 
         foreach (var targetHeight in _targetHeights)
         {
             var resizedFilePath = await ResizeAsync(filepath, width, height, targetHeight);
-            await SegmentVideoToHlsAsync(resizedFilePath, videoId);
+            if (string.IsNullOrWhiteSpace(resizedFilePath))
+                continue;
+
+            var segmentedIndexFilepath = await SegmentVideoToHlsAsync(resizedFilePath);
+            if (string.IsNullOrWhiteSpace(segmentedIndexFilepath))
+                continue;
+
+            var resizedMediaInfo = await FFProbe.AnalyseAsync(resizedFilePath);
+            var bitrate = resizedMediaInfo.PrimaryVideoStream?.BitRate ?? (long)resizedMediaInfo.Format.BitRate;
+
+            masterPlaylistContent.AppendLine($"#EXT-X-STREAM-INF:BANDWIDTH={bitrate},RESOLUTION={width}x{height}");
+            masterPlaylistContent.AppendLine(segmentedIndexFilepath);
         }
 
+        var outputDirectory = Path.GetDirectoryName(filepath);
+        var masterPlaylistPath = Path.Join(outputDirectory, "master.m3u8");
+        await File.WriteAllTextAsync(masterPlaylistPath, masterPlaylistContent.ToString());
+
         _logger.LogInformation("Processing video file compplete: {0}", Path.GetFileName(filepath));
+
+        return masterPlaylistPath;
     }
 
     public async Task EnqueueProcessingAsync(int videoId, Stream videoStream)
@@ -116,7 +136,7 @@ public class VideoProcessingService : IVideoProcessingService
             ?? throw new InvalidOperationException($"Video {videoId} not found");
 
         // Save source video
-        var srcName = $"{Guid.NewGuid():N}.mp4";
+        var srcName = "original.mp4";
         var path = await _storage.SaveVideoAsync(videoId, videoStream, srcName);
         video.FileName = srcName;
         video.FilePath = path;
@@ -126,7 +146,13 @@ public class VideoProcessingService : IVideoProcessingService
         // In a real system, enqueue a background job to transcode and HLS package
         _logger.LogInformation("Queued processing for video {VideoId}", videoId);
 
-        await ProcessVideoAsync(path, videoId);
+        var masterPlaylistPath = await ProcessVideoAsync(path);
+        if (!string.IsNullOrWhiteSpace(masterPlaylistPath))
+        {
+            video.HlsMasterPlaylistPath = masterPlaylistPath;
+            video.Status = VideoStatus.Ready;
+            await _videoRepository.UpdateAsync(video);
+        }
     }
 
     public async Task AddSubtitlesAsync(int videoId, IDictionary<string, Stream> subtitles)

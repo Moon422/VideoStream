@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using VideoStream.Domain.Entities;
 
 namespace VideoStream.Application.DTOs;
 
@@ -16,4 +17,15 @@ public class AddVideoInformationDto
 
     [Required]
     public int ChannelId { get; set; }
+
+    public Video ToVideo()
+    {
+        return new Video
+        {
+            Title = Title,
+            Description = Description,
+            Tags = Tags,
+            ChannelId = ChannelId
+        };
+    }
 }

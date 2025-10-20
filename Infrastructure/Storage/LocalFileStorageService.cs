@@ -1,11 +1,11 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using VideoStream.Application.Interfaces;
 
 namespace VideoStream.Infrastructure.Storage;
 
-public class LocalFileStorageService
+public class LocalFileStorageService : ILocalFileStorageService
 {
     private readonly ILogger<LocalFileStorageService> _logger;
     private readonly string _root;
