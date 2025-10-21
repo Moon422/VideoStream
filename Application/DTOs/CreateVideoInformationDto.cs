@@ -3,7 +3,7 @@ using VideoStream.Domain.Entities;
 
 namespace VideoStream.Application.DTOs;
 
-public class AddVideoInformationDto
+public class CreateVideoInformationDto
 {
     [Required, MaxLength(200)]
     public string Title { get; set; } = string.Empty;

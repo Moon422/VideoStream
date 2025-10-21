@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VideoStream.Application.DTOs;
 using VideoStream.Application.UseCases;
-using VideoStream.Domain.Entities;
-using VideoStream.Domain.Interfaces;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
@@ -17,27 +15,30 @@ namespace VideoStream.Presentation.Controllers;
 [Route("api/[controller]")]
 public class VideoController : ControllerBase
 {
-    private readonly AddVideoUseCase _addVideo;
+    private readonly CreateVideoUseCase _addVideo;
     private readonly UploadVideoUseCase _uploadVideo;
-    private readonly AddSubtitlesUseCase _addSubtitlesUseCase;
-    private readonly IVideoRepository _videos;
+    private readonly UploadSubtitlesUseCase _addSubtitlesUseCase;
+    private readonly GetVideoByIdUseCase _getVideoById;
+    private readonly GetVideosByChannelIdUseCase _getVideosByChannelId;
 
-    public VideoController(AddVideoUseCase addVideo,
+    public VideoController(CreateVideoUseCase addVideo,
         UploadVideoUseCase uploadVideo,
-        IVideoRepository videos,
-        AddSubtitlesUseCase addSubtitlesUseCase)
+        UploadSubtitlesUseCase addSubtitlesUseCase,
+        GetVideoByIdUseCase getVideoById,
+        GetVideosByChannelIdUseCase getVideosByChannelId)
     {
         _addVideo = addVideo;
-        _videos = videos;
         _uploadVideo = uploadVideo;
         _addSubtitlesUseCase = addSubtitlesUseCase;
+        _getVideoById = getVideoById;
+        _getVideosByChannelId = getVideosByChannelId;
     }
 
     [HttpPost("information")]
     public async Task<ActionResult> AddVideoInformation([FromBody] UploadVideoRequest request)
     {
         var result = await _addVideo.ExecuteAsync(request.ToAddVideoInformationDto());
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToVideoModel());
     }
 
     [HttpPost("{id:int}/upload")]
@@ -92,36 +93,25 @@ public class VideoController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult> GetById(int id)
     {
-        var entity = await _videos.GetByIdAsync(id);
-        if (entity == null)
+        var videoDto = await _getVideoById.ExecuteAsync(id);
+        if (videoDto is null)
             return NotFound();
 
-        var dto = Map(entity);
-        return Ok(dto);
+        return Ok(videoDto.ToVideoModel());
     }
 
     [HttpGet("by-channel/{channelId:int}")]
     public async Task<ActionResult> GetByChannel(int channelId, [FromQuery] int page = 0, [FromQuery] int pageSize = 20)
     {
-        var paged = await _videos.GetByChannelIdAsync(channelId, page, pageSize);
-        var dto = new PagedResponse<VideoOverviewModel>
+        var videoDtos = await _getVideosByChannelId.ExecuteAsync(channelId, page, pageSize);
+        var videoModels = videoDtos.Select(v => v.ToVideoOverviewModel()).ToList();
+        return Ok(new PagedResponse<VideoOverviewModel>
         {
-            Items = paged.Select(Map).ToList(),
-            PageIndex = paged.PageIndex,
-            PageSize = paged.PageSize,
-            TotalItems = paged.TotalItems,
-            TotalPages = paged.TotalPages
-        };
-        return Ok(dto);
+            Items = videoModels,
+            PageIndex = videoDtos.PageIndex,
+            PageSize = videoDtos.PageSize,
+            TotalItems = videoDtos.TotalItems,
+            TotalPages = videoDtos.TotalPages
+        });
     }
-
-    private static VideoOverviewModel Map(Video v) => new()
-    {
-        Id = v.Id,
-        Title = v.Title,
-        Description = v.Description,
-        Tags = v.Tags,
-        ChannelId = v.ChannelId,
-        ThumbnailPath = v.ThumbnailPath
-    };
 }

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using VideoStream.Application.DTOs;
 
 namespace VideoStream.Presentation.Models.Videos;
 
@@ -8,7 +8,23 @@ public record VideoModel : BaseEntityModel
     public string Description { get; set; }
     public string Tags { get; set; }
     public int ChannelId { get; set; }
-    public string FilePath { get; set; }
     public string HlsMasterPlaylistPath { get; set; }
     public string ThumbnailPath { get; set; }
+}
+
+public static class VideoDtoToVideoModelHelper
+{
+    public static VideoModel ToVideoModel(this VideoDto videoDto)
+    {
+        return new VideoModel
+        {
+            Id = videoDto.Id,
+            Title = videoDto.Title,
+            Description = videoDto.Description,
+            Tags = videoDto.Tags,
+            ChannelId = videoDto.ChannelId,
+            HlsMasterPlaylistPath = videoDto.HlsMasterPlaylistPath,
+            ThumbnailPath = videoDto.ThumbnailPath
+        };
+    }
 }

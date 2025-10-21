@@ -4,16 +4,16 @@ using VideoStream.Domain.Interfaces;
 
 namespace VideoStream.Application.UseCases;
 
-public class AddVideoUseCase
+public class CreateVideoUseCase
 {
     private readonly IVideoRepository _videoRepository;
 
-    public AddVideoUseCase(IVideoRepository videoRepository)
+    public CreateVideoUseCase(IVideoRepository videoRepository)
     {
         _videoRepository = videoRepository;
     }
 
-    public async Task<VideoDto> ExecuteAsync(AddVideoInformationDto request)
+    public async Task<VideoDto> ExecuteAsync(CreateVideoInformationDto request)
     {
         var video = await _videoRepository.AddAsync(request.ToVideo());
         return video.ToVideoDto();

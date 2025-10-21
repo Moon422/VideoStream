@@ -9,9 +9,9 @@ public class UploadVideoRequest
     public string? Description { get; set; }
     public string? Tags { get; set; }
 
-    public AddVideoInformationDto ToAddVideoInformationDto()
+    public CreateVideoInformationDto ToAddVideoInformationDto()
     {
-        return new AddVideoInformationDto
+        return new CreateVideoInformationDto
         {
             Title = Title,
             ChannelId = ChannelId,

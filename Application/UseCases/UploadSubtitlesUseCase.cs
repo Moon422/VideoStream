@@ -5,12 +5,12 @@ using VideoStream.Domain.Interfaces;
 
 namespace VideoStream.Application.UseCases;
 
-public class AddSubtitlesUseCase
+public class UploadSubtitlesUseCase
 {
     private readonly ISubtitleRepository _subtitleRepository;
     private readonly ILocalFileStorageService _localFileStorageService;
 
-    public AddSubtitlesUseCase(ISubtitleRepository subtitleRepository,
+    public UploadSubtitlesUseCase(ISubtitleRepository subtitleRepository,
         ILocalFileStorageService localFileStorageService)
     {
         _subtitleRepository = subtitleRepository;
