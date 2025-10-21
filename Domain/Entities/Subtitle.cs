@@ -8,8 +8,8 @@ public class Subtitle : BaseEntity
     public int VideoId { get; set; }
 
     [Required, MaxLength(16)]
-    public string Language { get; set; } = string.Empty;
+    public required string Language { get; set; }
 
     [Required, MaxLength(1024)]
-    public string FilePath { get; set; } = string.Empty;
+    public required string FilePath { get; set; }
 }

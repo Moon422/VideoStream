@@ -10,7 +10,7 @@ namespace VideoStream.Application.DTOs;
 public class UploadVideoSubtitlesDto
 {
     public int VideoId { get; set; }
-    public IDictionary<string, Stream> Subtitles { get; set; }
+    public required IDictionary<string, Stream> Subtitles { get; set; }
 
     public async Task<IList<Subtitle>> ToSubtitleList(ILocalFileStorageService localFileStorageService)
     {

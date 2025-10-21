@@ -8,7 +8,7 @@ namespace VideoStream.Domain.Entities;
 public class Channel : BaseEntity, ICreationLogged, IModificationLogged, ISoftDeleted
 {
     [Required, MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
 
     [MaxLength(2000)]
     public string Description { get; set; } = string.Empty;

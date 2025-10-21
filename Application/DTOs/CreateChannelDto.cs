@@ -4,7 +4,7 @@ namespace VideoStream.Application.DTOs;
 
 public class CreateChannelDto
 {
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
     public string Description { get; set; } = string.Empty;
     public int CreatedByUserId { get; set; }
 

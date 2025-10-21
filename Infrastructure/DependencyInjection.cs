@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VideoStream.Application.Events;
+using VideoStream.Application.Interfaces;
 using VideoStream.Domain.Interfaces;
 using VideoStream.Infrastructure.Data;
 using VideoStream.Infrastructure.Data.Repositories;
@@ -46,9 +47,9 @@ public static class DependencyInjection
         services.AddScoped<IEventPublisher, EventPublisher>();
 
         // Storage
-        var storageRoot = configuration["Storage:Root"] ?? Path.Combine(AppContext.BaseDirectory, "storage");
-        services.AddSingleton(sp =>
+        services.AddSingleton<ILocalFileStorageService, LocalFileStorageService>(sp =>
         {
+            var storageRoot = configuration["Storage:Root"] ?? Path.Combine(AppContext.BaseDirectory, "storage");
             var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LocalFileStorageService>>();
             return new LocalFileStorageService(logger, storageRoot);
         });

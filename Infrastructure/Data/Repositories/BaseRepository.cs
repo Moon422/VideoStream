@@ -86,17 +86,4 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
             await _eventPublisher.EntityUpdatedAsync(entity);
         }
     }
-
-    // public virtual Task<bool> ExistsAsync(int id)
-    // {
-    //     if (id <= 0)
-    //     {
-    //         throw new ArgumentOutOfRangeException(nameof(id), "Id must be positive.");
-    //     }
-
-    //     if (typeof(T).GetInterface(nameof(ISoftDeleted)) is not null)
-    //         return _db.Set<T>().AnyAsync(e => e.Id == id && e.);
-
-    //     return _db.Set<T>().AnyAsync(e => e.Id == id);
-    // }
 }

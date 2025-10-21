@@ -6,22 +6,22 @@ namespace VideoStream.Domain.Entities;
 public class User : BaseEntity, ICreationLogged, IModificationLogged, ISoftDeleted
 {
     [MaxLength(100)]
-    public string Firstname { get; set; } = string.Empty;
+    public required string Firstname { get; set; }
 
     [MaxLength(100)]
-    public string Lastname { get; set; } = string.Empty;
+    public required string Lastname { get; set; }
 
     [Required, MaxLength(50)]
-    public string Username { get; set; } = string.Empty;
+    public required string Username { get; set; }
 
     [Required, MaxLength(256)]
     [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public required string Email { get; set; }
 
     public bool IsAdmin { get; set; }
 
     [Required, MaxLength(60)]
-    public string PasswordHash { get; set; } = string.Empty;
+    public required string PasswordHash { get; set; }
 
     [Required]
     public DateTime CreatedOn { get; set; }

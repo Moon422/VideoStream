@@ -9,14 +9,11 @@ public class UploadVideoUseCase
 {
     private readonly IVideoRepository _videoRepository;
     private readonly IVideoProcessingService _videoProcessingService;
-    private readonly ISearchService _searchService;
 
     public UploadVideoUseCase(IVideoRepository videoRepository,
-        IVideoProcessingService videoProcessingService,
-        ISearchService searchService)
+        IVideoProcessingService videoProcessingService)
     {
         _videoProcessingService = videoProcessingService;
-        _searchService = searchService;
         _videoRepository = videoRepository;
     }
 

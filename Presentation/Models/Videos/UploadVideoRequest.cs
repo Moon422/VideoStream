@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using VideoStream.Application.DTOs;
 
 namespace VideoStream.Presentation.Models.Videos;
 
-public class UploadVideoRequest
+public class CreateVideoRequest
 {
-    public string Title { get; set; } = string.Empty;
+    [Required, MaxLength(200)]
+    public required string Title { get; set; }
     public int ChannelId { get; set; }
     public string? Description { get; set; }
     public string? Tags { get; set; }

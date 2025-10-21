@@ -35,7 +35,7 @@ public class VideoController : ControllerBase
     }
 
     [HttpPost("information")]
-    public async Task<ActionResult> AddVideoInformation([FromBody] UploadVideoRequest request)
+    public async Task<ActionResult> AddVideoInformation([FromBody] CreateVideoRequest request)
     {
         var result = await _addVideo.ExecuteAsync(request.ToAddVideoInformationDto());
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToVideoModel());

@@ -1,33 +1,29 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using FFMpegCore;
 using FFMpegCore.Enums;
 using Microsoft.Extensions.Logging;
+using VideoStream.Application.Interfaces;
 using VideoStream.Domain.Entities;
 using VideoStream.Domain.Interfaces;
-using VideoStream.Infrastructure.Storage;
 
 namespace VideoStream.Infrastructure.Services;
 
 public class VideoProcessingService : IVideoProcessingService
 {
     private readonly IVideoRepository _videoRepository;
-    private readonly ISubtitleRepository _subtitleRepository;
     private readonly ILogger<VideoProcessingService> _logger;
-    private readonly LocalFileStorageService _storage;
+    private readonly ILocalFileStorageService _storage;
 
     private readonly int[] _targetHeights = [360, 480, 720, 1080];
 
     public VideoProcessingService(IVideoRepository videoRepository,
-        ISubtitleRepository subtitleRepository,
         ILogger<VideoProcessingService> logger,
-        LocalFileStorageService storage)
+        ILocalFileStorageService storage)
     {
         _videoRepository = videoRepository;
-        _subtitleRepository = subtitleRepository;
         _logger = logger;
         _storage = storage;
     }
