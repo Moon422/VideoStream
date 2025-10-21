@@ -13,6 +13,9 @@ public static class DependencyInjection
         services.AddScoped<UploadVideoUseCase>();
         services.AddScoped<SearchVideosUseCase>();
         services.AddScoped<CreateUserUseCase>();
+        services.AddScoped<GetUserByIdUseCase>();
+        services.AddScoped<CreateChannelUseCase>();
+        services.AddScoped<GetChannelByIdUseCase>();
 
         // TODO: register mappers/validators/behaviors here when added
         return services;

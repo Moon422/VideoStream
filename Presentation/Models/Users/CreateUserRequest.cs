@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using VideoStream.Application.DTOs;
 
 namespace VideoStream.Presentation.Models.Users;
 
@@ -20,4 +21,16 @@ public record CreateUserRequest : BaseModel
     [MinLength(6)]
     [MaxLength(20)]
     public string Password { get; set; }
+
+    public CreateUserDto ToCreateUserDto()
+    {
+        return new CreateUserDto
+        {
+            Firstname = Firstname,
+            Lastname = Lastname,
+            Username = Username,
+            Email = Email,
+            Password = Password
+        };
+    }
 }

@@ -4,18 +4,21 @@ using VideoStream.Domain.Interfaces;
 
 namespace VideoStream.Application.UseCases;
 
-public class CreateUserUseCase
+public class GetUserByIdUseCase
 {
     private readonly IUserRepository _userRepository;
 
-    public CreateUserUseCase(IUserRepository userRepository)
+    public GetUserByIdUseCase(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
 
-    public async Task<UserDto> ExecuteAsync(CreateUserDto request)
+    public async Task<UserDto?> ExecuteAsync(int userId)
     {
-        var user = await _userRepository.AddAsync(request.ToUser());
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user is null)
+            return null;
+
         return user.ToUserDto();
     }
 }
