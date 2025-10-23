@@ -25,6 +25,19 @@ public class SubtitleRepository : BaseRepository<Subtitle>, ISubtitleRepository
         _paginator = paginator;
     }
 
+    public override async Task<Subtitle> AddAsync(Subtitle entity, bool publishEvent = true)
+    {
+        var existingSubtitle = await _db.Set<Subtitle>()
+            .FirstOrDefaultAsync(e => e.VideoId == entity.VideoId &&
+                                      e.Language.ToLower() == entity.Language.ToLower());
+
+        if (existingSubtitle is Subtitle)
+            return await UpdateAsync(entity, publishEvent);
+
+        return await base.AddAsync(entity, publishEvent);
+    }
+
+
     public async Task<Subtitle?> GetSubtitleAsync(int videoId, string language)
     {
         if (videoId <= 0)

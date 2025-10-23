@@ -41,6 +41,14 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         return query.OfType<ISoftDeleted>().Where(entry => !entry.Deleted).OfType<T>();
     }
 
+    protected virtual bool IsSoftDeletedEntity()
+    {
+        if (typeof(T).GetInterface(nameof(ISoftDeleted)) == null)
+            return false;
+
+        return true;
+    }
+
     public virtual async Task<T> AddAsync(T entity, bool publishEvent = true)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -56,7 +64,7 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         return entity;
     }
 
-    public virtual async Task<T?> GetByIdAsync(int id)
+    public virtual async Task<T?> GetByIdAsync(int id, bool skipDeleted = true)
     {
         if (id <= 0)
         {
@@ -64,7 +72,12 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         }
 
         var cacheKey = _cacheManager.PrepareCacheKey(EntityCacheDefaults<T>.ByIdCacheKey, id);
-        return await _cacheManager.GetAsync(cacheKey, async () => await _db.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id));
+        var entity = await _cacheManager.GetAsync(cacheKey, async () => await _db.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id));
+
+        if (skipDeleted && (entity is ISoftDeleted s) && s.Deleted)
+            return null;
+
+        return entity;
     }
 
     public virtual async Task<IPagedList<T>> GetAllAsync(int page = 0, int pageSize = int.MaxValue)
@@ -73,7 +86,7 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         return await _cacheManager.GetAsync(cacheKey, async () => await _paginator.PaginateAsync(_db.Set<T>().AsNoTracking().OrderBy(e => e.Id), page, pageSize));
     }
 
-    public virtual async Task UpdateAsync(T entity, bool publishEvent = true)
+    public virtual async Task<T> UpdateAsync(T entity, bool publishEvent = true)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -85,5 +98,7 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         {
             await _eventPublisher.EntityUpdatedAsync(entity);
         }
+
+        return entity;
     }
 }

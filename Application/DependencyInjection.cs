@@ -15,6 +15,8 @@ public static class DependencyInjection
         services.AddScoped<SearchVideosUseCase>();
         services.AddScoped<CreateUserUseCase>();
         services.AddScoped<GetUserByIdUseCase>();
+        services.AddScoped<GetUserByEmailUseCase>();
+        services.AddScoped<GetUserByUsernameUseCase>();
         services.AddScoped<CreateChannelUseCase>();
         services.AddScoped<GetChannelByIdUseCase>();
         services.AddScoped<GetVideosByChannelIdUseCase>();

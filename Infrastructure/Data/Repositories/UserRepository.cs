@@ -19,18 +19,18 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             cacheManager)
     { }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email, bool skipDeleted = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
 
-        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => (!skipDeleted || !u.Deleted) && u.Email == email);
     }
 
-    public async Task<User?> GetByUsernameAsync(string username)
+    public async Task<User?> GetByUsernameAsync(string username, bool skipDeleted = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
 
-        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
+        return await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => (!skipDeleted || !u.Deleted) && u.Username == username);
     }
 
     public async Task<bool> IsAdminAsync(int userId)

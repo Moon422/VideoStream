@@ -8,6 +8,9 @@ using System.IO;
 using System.Linq;
 using VideoStream.Presentation.Models.Videos;
 using VideoStream.Presentation.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using VideoStream.Domain.Exceptions;
+using System;
 
 namespace VideoStream.Presentation.Controllers;
 
@@ -37,8 +40,27 @@ public class VideoController : ControllerBase
     [HttpPost("information")]
     public async Task<ActionResult> AddVideoInformation([FromBody] CreateVideoRequest request)
     {
-        var result = await _addVideo.ExecuteAsync(request.ToAddVideoInformationDto());
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToVideoModel());
+        try
+        {
+            var result = await _addVideo.ExecuteAsync(request.ToAddVideoInformationDto());
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result.ToVideoModel());
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch
+        {
+            return BadRequest("Something went wrong! Please try again.");
+        }
     }
 
     [HttpPost("{id:int}/upload")]
@@ -56,13 +78,32 @@ public class VideoController : ControllerBase
         if (formFile.ContentType != "video/mp4")
             return BadRequest("Invalid file type. Expected video/mp4.");
 
-        await _uploadVideo.ExecuteAsync(new UploadVideoDto
+        try
         {
-            VideoId = id,
-            VideoStream = formFile.OpenReadStream()
-        });
+            await _uploadVideo.ExecuteAsync(new UploadVideoDto
+            {
+                VideoId = id,
+                VideoStream = formFile.OpenReadStream()
+            });
 
-        return Ok("Video uploaded");
+            return Ok("Video uploaded");
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch
+        {
+            return BadRequest("Something went wrong! Please try again.");
+        }
     }
 
     [HttpPost("{id:int}/upload-subtitles")]
@@ -81,13 +122,32 @@ public class VideoController : ControllerBase
             subtitles.Add(filenameWithoutExt, file.OpenReadStream());
         }
 
-        await _addSubtitlesUseCase.ExecuteAsync(new UploadVideoSubtitlesDto
+        try
         {
-            VideoId = id,
-            Subtitles = subtitles
-        });
+            await _addSubtitlesUseCase.ExecuteAsync(new UploadVideoSubtitlesDto
+            {
+                VideoId = id,
+                Subtitles = subtitles
+            });
 
-        return Ok();
+            return Ok();
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch
+        {
+            return BadRequest("Something went wrong! Please try again.");
+        }
     }
 
     [HttpGet("{id:int}")]
