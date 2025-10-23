@@ -28,6 +28,8 @@ public class Startup
         services.AddOpenApi();
         services.AddSwaggerGen();
 
+        services.AddHttpContextAccessor();
+
         services.AddMemoryCache();
 
         services.AddScoped<ICacheManager, CacheManager>();
@@ -37,6 +39,8 @@ public class Startup
 
         // Infrastructure services
         services.AddInfrastructure(Configuration);
+
+        services.AddScoped<IWorkContext, WorkContext>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
