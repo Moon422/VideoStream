@@ -12,10 +12,3 @@ db:
 	git add Infrastructure/Migrations 
 	git commit -m '$(msg)' 
 	echo "migration complete and committed to git"
-
-# client:
-# 	cd $(client) && npm install && npm run dev
-
-# full:
-# 	@echo "Starting both API and client..."
-# 	@$(MAKE) -j2 watch client
