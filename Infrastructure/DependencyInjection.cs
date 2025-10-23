@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,11 +48,13 @@ public static class DependencyInjection
         services.AddScoped<IEventPublisher, EventPublisher>();
 
         // Storage
-        services.AddSingleton<ILocalFileStorageService, LocalFileStorageService>(sp =>
+        services.AddAzureClient
+
+        services.AddSingleton<IFileStorageService, AzureFileStorageService>(sp =>
         {
-            var storageRoot = configuration["Storage:Root"] ?? Path.Combine(AppContext.BaseDirectory, "storage");
-            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LocalFileStorageService>>();
-            return new LocalFileStorageService(logger, storageRoot);
+            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AzureFileStorageService>>();
+            var azureBlobService = new BlobServiceClient(configuration.GetConnectionString("AzureStorage:ConnectionString"));
+            return new AzureFileStorageService(logger, azureBlobService);
         });
 
         // Services

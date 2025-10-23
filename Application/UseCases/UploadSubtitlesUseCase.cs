@@ -13,13 +13,13 @@ public class UploadSubtitlesUseCase
     private readonly ISubtitleRepository _subtitleRepository;
     private readonly IVideoRepository _videoRepository;
     private readonly IChannelRepository _channelRepository;
-    private readonly ILocalFileStorageService _localFileStorageService;
+    private readonly IFileStorageService _localFileStorageService;
     private readonly IWorkContext _workContext;
 
     public UploadSubtitlesUseCase(ISubtitleRepository subtitleRepository,
         IVideoRepository videoRepository,
         IChannelRepository channelRepository,
-        ILocalFileStorageService localFileStorageService,
+        IFileStorageService localFileStorageService,
         IWorkContext workContext)
     {
         _subtitleRepository = subtitleRepository;

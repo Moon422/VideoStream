@@ -5,7 +5,7 @@ using VideoStream.Application.Interfaces;
 
 namespace VideoStream.Infrastructure.Storage;
 
-public class LocalFileStorageService : ILocalFileStorageService
+public class LocalFileStorageService : IFileStorageService
 {
     private readonly ILogger<LocalFileStorageService> _logger;
     private readonly string _root;

@@ -12,7 +12,7 @@ public class UploadVideoSubtitlesDto
     public int VideoId { get; set; }
     public required IDictionary<string, Stream> Subtitles { get; set; }
 
-    public async Task<IList<Subtitle>> ToSubtitleList(ILocalFileStorageService localFileStorageService)
+    public async Task<IList<Subtitle>> ToSubtitleList(IFileStorageService localFileStorageService)
     {
         return await Subtitles.ToAsyncEnumerable()
             .SelectAwait(async kv => new Subtitle

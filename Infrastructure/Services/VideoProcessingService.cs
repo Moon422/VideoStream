@@ -15,13 +15,13 @@ public class VideoProcessingService : IVideoProcessingService
 {
     private readonly IVideoRepository _videoRepository;
     private readonly ILogger<VideoProcessingService> _logger;
-    private readonly ILocalFileStorageService _storage;
+    private readonly IFileStorageService _storage;
 
     private readonly int[] _targetHeights = [360, 480, 720, 1080];
 
     public VideoProcessingService(IVideoRepository videoRepository,
         ILogger<VideoProcessingService> logger,
-        ILocalFileStorageService storage)
+        IFileStorageService storage)
     {
         _videoRepository = videoRepository;
         _logger = logger;
