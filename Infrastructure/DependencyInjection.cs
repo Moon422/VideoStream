@@ -50,7 +50,7 @@ public static class DependencyInjection
         // Storage
         services.AddAzureClients(clientBuilder =>
         {
-            clientBuilder.AddBlobServiceClient(configuration.GetConnectionString("AzureStorage:ConnectionString"));
+            clientBuilder.AddBlobServiceClient(configuration.GetConnectionString("AzureBlobStorage:ConnectionStrings"));
         });
 
         services.AddSingleton<IFileStorageService, AzureFileStorageService>();
