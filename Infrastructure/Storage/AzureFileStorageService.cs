@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -18,13 +19,39 @@ public class AzureFileStorageService : IFileStorageService
         _blobServiceClient = blobServiceClient;
     }
 
-    public Task<string> SaveSubtitleAsync(int videoId, string language, Stream content)
+    public async Task<string> SaveSubtitleAsync(int videoId, string language, Stream content)
     {
-        throw new System.NotImplementedException();
+        try
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient("videos");
+            var blobName = $"{videoId}/subtitles/{language}.vtt";
+            var blobClient = containerClient.GetBlobClient(blobName);
+            await blobClient.UploadAsync(content, true);
+
+            return blobClient.Uri.ToString();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to upload subtitle {VideoId}/subtitles/{Language}.vtt", videoId, language);
+            return "";
+        }
     }
 
-    public Task<string> SaveVideoAsync(int videoId, Stream content, string fileName)
+    public async Task<string> SaveVideoAsync(int videoId, string fileName, Stream content)
     {
-        _blobServiceClient.
+        try
+        {
+            var containerClient = _blobServiceClient.GetBlobContainerClient("videos");
+            var blobName = $"{videoId}/{fileName}";
+            var blobClient = containerClient.GetBlobClient(blobName);
+            await blobClient.UploadAsync(content, true);
+
+            return blobClient.Uri.ToString();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to upload video {VideoId}/{FileName}", videoId, fileName);
+            return "";
+        }
     }
 }

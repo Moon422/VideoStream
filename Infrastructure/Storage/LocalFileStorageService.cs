@@ -17,7 +17,7 @@ public class LocalFileStorageService : IFileStorageService
         Directory.CreateDirectory(_root);
     }
 
-    public async Task<string> SaveVideoAsync(int videoId, Stream content, string fileName)
+    public async Task<string> SaveVideoAsync(int videoId, string fileName, Stream content)
     {
         var dir = Path.Combine(_root, "videos", videoId.ToString());
         Directory.CreateDirectory(dir);

@@ -48,14 +48,12 @@ public static class DependencyInjection
         services.AddScoped<IEventPublisher, EventPublisher>();
 
         // Storage
-        services.AddAzureClients
-
-        services.AddSingleton<IFileStorageService, AzureFileStorageService>(sp =>
+        services.AddAzureClients(clientBuilder =>
         {
-            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AzureFileStorageService>>();
-            var azureBlobService = new BlobServiceClient(configuration.GetConnectionString("AzureStorage:ConnectionString"));
-            return new AzureFileStorageService(logger, azureBlobService);
+            clientBuilder.AddBlobServiceClient(configuration.GetConnectionString("AzureStorage:ConnectionString"));
         });
+
+        services.AddSingleton<IFileStorageService, AzureFileStorageService>();
 
         // Services
         services.AddScoped<IVideoProcessingService, VideoProcessingService>();

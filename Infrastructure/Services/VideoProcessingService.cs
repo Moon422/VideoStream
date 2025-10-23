@@ -133,7 +133,7 @@ public class VideoProcessingService : IVideoProcessingService
 
         // Save source video
         var srcName = "original.mp4";
-        var path = await _storage.SaveVideoAsync(videoId, videoStream, srcName);
+        var path = await _storage.SaveVideoAsync(videoId, srcName, videoStream);
         video.FileName = srcName;
         video.FilePath = path;
         video.Status = VideoStatus.Processing;
