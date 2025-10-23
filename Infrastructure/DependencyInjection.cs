@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using Microsoft.Extensions.Azure;
 using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +48,7 @@ public static class DependencyInjection
         services.AddScoped<IEventPublisher, EventPublisher>();
 
         // Storage
-        services.AddAzureClient
+        services.AddAzureClients
 
         services.AddSingleton<IFileStorageService, AzureFileStorageService>(sp =>
         {
