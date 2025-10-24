@@ -19,6 +19,17 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             cacheManager)
     { }
 
+    public override async Task<User> AddAsync(User entity, bool publishEvent = true)
+    {
+        var user = (await GetByEmailAsync(entity.Email))
+            ?? await GetByUsernameAsync(entity.Username);
+
+        if (user is not null)
+            throw new InvalidOperationException("User with email or username already exists.");
+
+        return await base.AddAsync(entity, publishEvent);
+    }
+
     public async Task<User?> GetByEmailAsync(string email, bool skipDeleted = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);

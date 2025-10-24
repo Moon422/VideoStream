@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VideoStream.Application.UseCases;
@@ -32,7 +33,20 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] CreateUserRequest req)
     {
-        var userDto = await _createUserUseCase.ExecuteAsync(req.ToCreateUserDto());
-        return CreatedAtAction(nameof(GetById), new { id = userDto.Id }, userDto.ToUserModel());
+        try
+        {
+            var userDto = await _createUserUseCase.ExecuteAsync(req.ToCreateUserDto());
+            return CreatedAtAction(nameof(GetById), new { id = userDto.Id }, userDto.ToUserModel());
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("[action]")]
+    public async Task<IActionResult> AccountDetails()
+    {
+        return Ok();
     }
 }

@@ -11,6 +11,7 @@ using VideoStream.Presentation.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using VideoStream.Domain.Exceptions;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VideoStream.Presentation.Controllers;
 
@@ -64,6 +65,7 @@ public class VideoController : ControllerBase
     }
 
     [HttpPost("{id:int}/upload")]
+    [AllowAnonymous] // TODO: Remove this for production - only for testing
     public async Task<IActionResult> UploadVideo(int id, IFormFile formFile)
     {
         if (formFile is null || formFile.Length <= 0)

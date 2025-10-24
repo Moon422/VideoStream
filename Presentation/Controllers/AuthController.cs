@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using VideoStream.Application.DTOs;
 using VideoStream.Application.UseCases;
 using VideoStream.Presentation.Models.Auth;
+using VideoStream.Presentation.Models.Users;
 
 namespace VideoStream.Presentation.Controllers;
 
@@ -20,16 +21,19 @@ namespace VideoStream.Presentation.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly VerifyUserLoginUseCase _verifyUserLoginUseCase;
+    private readonly CreateUserUseCase _createUserUseCase;
     private readonly IConfiguration _configuration;
 
     public AuthController(VerifyUserLoginUseCase verifyUserLoginUseCase,
+        CreateUserUseCase createUserUseCase,
         IConfiguration configuration)
     {
         _verifyUserLoginUseCase = verifyUserLoginUseCase;
         _configuration = configuration;
+        _createUserUseCase = createUserUseCase;
     }
 
-    private async Task<string> GenerateJwtToken(UserDto user)
+    private async Task<string> GenerateJwtTokenAsync(UserDto user)
     {
         var claims = new List<Claim>
         {
@@ -59,11 +63,11 @@ public class AuthController : ControllerBase
 
     private async Task<string> LoginAsync(UserDto user)
     {
-        var jwt = await _authService.GenerateJwtToken(user);
-        await _authService.GenerateRefreshToken(user);
+        var jwt = await GenerateJwtTokenAsync(user);
+        // await _authService.GenerateRefreshToken(user);
 
-        user.LastLogin = DateTime.UtcNow;
-        await _userService.UpdateUserAsync(user);
+        // user.LastLogin = DateTime.UtcNow;
+        // await _userService.UpdateUserAsync(user);
 
         return jwt;
     }
@@ -74,126 +78,107 @@ public class AuthController : ControllerBase
         try
         {
             var userDto = await _verifyUserLoginUseCase.ExecuteAsync(model.Email, model.Password);
+            var jwt = await LoginAsync(userDto);
+            var loginResponse = new LoginResponseModel
+            {
+                User = userDto.ToUserModel(),
+                Jwt = jwt
+            };
+
+            return Ok(loginResponse);
         }
         catch (InvalidCredentialException ex)
         {
             return BadRequest(ex.Message);
         }
-
-        var userModel = user.ToModel();
-        var jwt = await LoginAsync(user);
-        var loginResponse = new LoginResponseModel
-        {
-            User = userModel,
-            Jwt = jwt
-        };
-
-        response.Data = loginResponse;
-
-        return Ok(response);
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> Register([FromBody] RegistrationModel model)
+    public async Task<IActionResult> Register([FromBody] CreateUserRequest req)
     {
-        var user = (await _userService.GetUserByEmailAsync(model.Email))
-            ?? await _userService.GetUserByUseranmeAsync(model.Username);
-
-        if (user is not null)
-        {
-            return BadRequest("User with email or username already exists.");
-        }
-
-        user = model.ToEntity();
         try
         {
-            await _transactionManager.ExecuteAsync(async () =>
-            {
-                await _userService.CreateUserAsync(user);
-                await _userService.CreatePasswordAsync(user.Id, model.Password);
-            });
-
-            var userModel = user.ToModel();
-            var jwt = await LoginAsync(user);
+            var userDto = await _createUserUseCase.ExecuteAsync(req.ToCreateUserDto());
+            var jwt = await LoginAsync(userDto);
             var response = new LoginResponseModel
             {
-                User = userModel,
+                User = userDto.ToUserModel(),
                 Jwt = jwt
             };
 
-            return CreatedAtAction(nameof(Details), response);
+            return CreatedAtAction(nameof(UserController.AccountDetails), "User", null, response);
         }
-        catch
+        catch (InvalidOperationException ex)
         {
-            return Problem();
+            return BadRequest(ex.Message);
         }
     }
 
-    [HttpGet("refresh-token")]
-    public async Task<IActionResult> RefreshToken()
-    {
-        var token = HttpContext.Request.Cookies["refresh-token"];
-        var response = new HttpResponseModel<LoginResponseModel>();
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            response.StatusCode = StatusCodes.Status401Unauthorized;
-            response.Errors.Add("Invalid authentication token.");
+    // [HttpGet("refresh-token")]
+    // public async Task<IActionResult> RefreshToken()
+    // {
+    //     var token = HttpContext.Request.Cookies["refresh-token"];
+    //     var response = new HttpResponseModel<LoginResponseModel>();
+    //     if (string.IsNullOrWhiteSpace(token))
+    //     {
+    //         response.StatusCode = StatusCodes.Status401Unauthorized;
+    //         response.Errors.Add("Invalid authentication token.");
 
-            return Unauthorized(response);
-        }
+    //         return Unauthorized(response);
+    //     }
 
-        var refreshToken = await _refreshTokenService.GetRefreshTokenByTokenAsync(token);
-        if (refreshToken is null)
-        {
-            response.StatusCode = StatusCodes.Status401Unauthorized;
-            response.Errors.Add("Invalid authentication token.");
+    //     var refreshToken = await _refreshTokenService.GetRefreshTokenByTokenAsync(token);
+    //     if (refreshToken is null)
+    //     {
+    //         response.StatusCode = StatusCodes.Status401Unauthorized;
+    //         response.Errors.Add("Invalid authentication token.");
 
-            return Unauthorized(response);
-        }
+    //         return Unauthorized(response);
+    //     }
 
-        if (!refreshToken.IsValid)
-        {
-            response.StatusCode = StatusCodes.Status401Unauthorized;
-            response.Errors.Add("Invalid authentication token.");
+    //     if (!refreshToken.IsValid)
+    //     {
+    //         response.StatusCode = StatusCodes.Status401Unauthorized;
+    //         response.Errors.Add("Invalid authentication token.");
 
-            return Unauthorized(response);
-        }
+    //         return Unauthorized(response);
+    //     }
 
-        var user = await _userService.GetUserByIdAsync(refreshToken.UserId);
-        if (user is null)
-        {
-            response.StatusCode = StatusCodes.Status400BadRequest;
-            response.Errors.Add("User not found.");
+    //     var user = await _userService.GetUserByIdAsync(refreshToken.UserId);
+    //     if (user is null)
+    //     {
+    //         response.StatusCode = StatusCodes.Status400BadRequest;
+    //         response.Errors.Add("User not found.");
 
-            return BadRequest(response);
-        }
+    //         return BadRequest(response);
+    //     }
 
-        var expirationDurationRemaining = refreshToken.ExpiryDate - DateTime.UtcNow;
-        if (expirationDurationRemaining < TimeSpan.Zero)
-        {
-            response.StatusCode = StatusCodes.Status401Unauthorized;
-            response.Errors.Add("Invalid authentication token.");
+    //     var expirationDurationRemaining = refreshToken.ExpiryDate - DateTime.UtcNow;
+    //     if (expirationDurationRemaining < TimeSpan.Zero)
+    //     {
+    //         response.StatusCode = StatusCodes.Status401Unauthorized;
+    //         response.Errors.Add("Invalid authentication token.");
 
-            return Unauthorized(response);
-        }
+    //         return Unauthorized(response);
+    //     }
 
-        var expirationHourRemaining = expirationDurationRemaining.TotalHours;
-        if (expirationHourRemaining <= 24)
-        {
-            await _authService.GenerateRefreshToken(user);
-        }
+    //     var expirationHourRemaining = expirationDurationRemaining.TotalHours;
+    //     if (expirationHourRemaining <= 24)
+    //     {
+    //         await _authService.GenerateRefreshToken(user);
+    //     }
 
-        var userModel = user.ToModel();
-        var jwt = await _authService.GenerateJwtToken(user);
-        var loginResponse = new LoginResponseModel
-        {
-            User = userModel,
-            Jwt = jwt
-        };
+    //     var userModel = user.ToModel();
+    //     var jwt = await _authService.GenerateJwtToken(user);
+    //     var loginResponse = new LoginResponseModel
+    //     {
+    //         User = userModel,
+    //         Jwt = jwt
+    //     };
 
-        response.StatusCode = StatusCodes.Status200OK;
-        response.Data = loginResponse;
+    //     response.StatusCode = StatusCodes.Status200OK;
+    //     response.Data = loginResponse;
 
-        return Ok(response);
-    }
+    //     return Ok(response);
+    // }
 }
