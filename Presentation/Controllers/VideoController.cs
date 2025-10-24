@@ -65,7 +65,8 @@ public class VideoController : ControllerBase
     }
 
     [HttpPost("{id:int}/upload")]
-    [AllowAnonymous] // TODO: Remove this for production - only for testing
+    // [RequestFormLimits(MultipartBodyLengthLimit = 100_000_000_000_000)]
+    [DisableRequestSizeLimit]
     public async Task<IActionResult> UploadVideo(int id, IFormFile formFile)
     {
         if (formFile is null || formFile.Length <= 0)

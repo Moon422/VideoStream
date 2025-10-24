@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Logging;
 using VideoStream.Application.Interfaces;
 
@@ -44,7 +45,14 @@ public class AzureFileStorageService : IFileStorageService
             var containerClient = _blobServiceClient.GetBlobContainerClient("videos");
             var blobName = $"{videoId}/{fileName}";
             var blobClient = containerClient.GetBlobClient(blobName);
-            await blobClient.UploadAsync(content, true);
+
+            await blobClient.UploadAsync(content, new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = "video/mp4"
+                },
+            });
 
             return blobClient.Uri.ToString();
         }

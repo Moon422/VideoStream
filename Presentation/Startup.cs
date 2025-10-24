@@ -17,6 +17,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace VideoStream.Presentation;
 
@@ -31,6 +33,18 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        // services.Configure<FormOptions>(options =>
+        // {
+        //     options.ValueLengthLimit = int.MaxValue;
+        //     options.MultipartBodyLengthLimit = int.MaxValue; // or 100MB: 100 * 1024 * 1024
+        //     options.MultipartHeadersLengthLimit = int.MaxValue;
+        // });
+
+        // services.Configure<KestrelServerOptions>(options =>
+        // {
+        //     options.Limits.MaxRequestBodySize = int.MaxValue; // or 100MB: 100 * 1024 * 1024
+        // });
+
         services.AddControllers();
         services.AddOpenApi();
         services.AddSwaggerGen(c =>
