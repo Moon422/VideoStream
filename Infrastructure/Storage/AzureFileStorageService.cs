@@ -20,6 +20,8 @@ public class AzureFileStorageService : IFileStorageService
         _blobServiceClient = blobServiceClient;
     }
 
+    public string Root => _blobServiceClient.Uri.ToString();
+
     public async Task<string> SaveSubtitleAsync(int videoId, string language, Stream content)
     {
         try
