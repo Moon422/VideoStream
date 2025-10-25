@@ -28,17 +28,11 @@ public class VideoProcessingService : IVideoProcessingService
         _storage = storage;
     }
 
-    private async Task<string?> ResizeAsync(string filepath, int width, int height, int targetHeight)
+    private async Task<string?> ResizeAsync(string filepath, int targetWidth, int targetHeight)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filepath);
 
-        if (targetHeight > height) return null;
-
         _logger.LogInformation("Resizing video file: {0} to {1}p", Path.GetFileName(filepath), targetHeight);
-
-        int targetWidth = (int)((float)width / height * targetHeight);
-        if (targetWidth % 2 != 0)
-            targetWidth++;
 
         var directory = Path.GetDirectoryName(filepath);
         var fileExt = Path.GetExtension(filepath);
@@ -102,7 +96,14 @@ public class VideoProcessingService : IVideoProcessingService
 
         foreach (var targetHeight in _targetHeights)
         {
-            var resizedFilePath = await ResizeAsync(filepath, width, height, targetHeight);
+            int targetWidth = (int)((float)width / height * targetHeight);
+            if (targetWidth % 2 != 0)
+                targetWidth++;
+
+            if (targetHeight > height)
+                continue;
+
+            var resizedFilePath = await ResizeAsync(filepath, targetWidth, targetHeight);
             if (string.IsNullOrWhiteSpace(resizedFilePath))
                 continue;
 
@@ -113,7 +114,7 @@ public class VideoProcessingService : IVideoProcessingService
             var resizedMediaInfo = await FFProbe.AnalyseAsync(resizedFilePath);
             var bitrate = resizedMediaInfo.PrimaryVideoStream?.BitRate ?? (long)resizedMediaInfo.Format.BitRate;
 
-            masterPlaylistContent.AppendLine($"#EXT-X-STREAM-INF:BANDWIDTH={bitrate},RESOLUTION={width}x{height}");
+            masterPlaylistContent.AppendLine($"#EXT-X-STREAM-INF:BANDWIDTH={bitrate},RESOLUTION={targetWidth}x{targetHeight}");
             masterPlaylistContent.AppendLine(segmentedIndexFilepath);
         }
 

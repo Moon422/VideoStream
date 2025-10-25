@@ -8,10 +8,9 @@ using System.IO;
 using System.Linq;
 using VideoStream.Presentation.Models.Videos;
 using VideoStream.Presentation.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using VideoStream.Domain.Exceptions;
 using System;
-using Microsoft.AspNetCore.Authorization;
+using VideoStream.Application.Interfaces;
 
 namespace VideoStream.Presentation.Controllers;
 
@@ -24,18 +23,21 @@ public class VideoController : ControllerBase
     private readonly UploadSubtitlesUseCase _addSubtitlesUseCase;
     private readonly GetVideoByIdUseCase _getVideoById;
     private readonly GetVideosByChannelIdUseCase _getVideosByChannelId;
+    private readonly IFileStorageService _fileStorageService;
 
     public VideoController(CreateVideoUseCase addVideo,
         UploadVideoUseCase uploadVideo,
         UploadSubtitlesUseCase addSubtitlesUseCase,
         GetVideoByIdUseCase getVideoById,
-        GetVideosByChannelIdUseCase getVideosByChannelId)
+        GetVideosByChannelIdUseCase getVideosByChannelId,
+        IFileStorageService fileStorageService)
     {
         _addVideo = addVideo;
         _uploadVideo = uploadVideo;
         _addSubtitlesUseCase = addSubtitlesUseCase;
         _getVideoById = getVideoById;
         _getVideosByChannelId = getVideosByChannelId;
+        _fileStorageService = fileStorageService;
     }
 
     [HttpPost("information")]
@@ -154,7 +156,7 @@ public class VideoController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
         var videoDto = await _getVideoById.ExecuteAsync(id);
         if (videoDto is null)
@@ -164,7 +166,7 @@ public class VideoController : ControllerBase
     }
 
     [HttpGet("by-channel/{channelId:int}")]
-    public async Task<ActionResult> GetByChannel(int channelId, [FromQuery] int page = 0, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> GetByChannel(int channelId, [FromQuery] int page = 0, [FromQuery] int pageSize = 20)
     {
         var videoDtos = await _getVideosByChannelId.ExecuteAsync(channelId, page, pageSize);
         var videoModels = videoDtos.Select(v => v.ToVideoOverviewModel()).ToList();
@@ -176,5 +178,19 @@ public class VideoController : ControllerBase
             TotalItems = videoDtos.TotalItems,
             TotalPages = videoDtos.TotalPages
         });
+    }
+
+    [HttpGet("{videoId:int}/stream")]
+    public async Task<IActionResult> SteamVideo(int videoId)
+    {
+        var videoDto = await _getVideoById.ExecuteAsync(videoId);
+        if (videoDto is null)
+            return NotFound();
+
+        var hlsMasterPlaylistPath = Path.Join(_fileStorageService.Root, videoDto.HlsMasterPlaylistPath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(hlsMasterPlaylistPath);
+
+        var masterPlaylistFile = System.IO.File.OpenRead(hlsMasterPlaylistPath);
+        return File(masterPlaylistFile, "application/vnd.apple.mpegurl");
     }
 }
