@@ -135,7 +135,7 @@ public class VideoProcessingService : IVideoProcessingService
         var srcName = "original.mp4";
         var path = await _storage.SaveVideoAsync(videoId, srcName, videoStream);
         video.FileName = srcName;
-        video.FilePath = path;
+        video.FilePath = Path.GetRelativePath(_storage.Root, path);
         video.Status = VideoStatus.Processing;
         await _videoRepository.UpdateAsync(video);
 
@@ -145,7 +145,7 @@ public class VideoProcessingService : IVideoProcessingService
         var masterPlaylistPath = await ProcessVideoAsync(path);
         if (!string.IsNullOrWhiteSpace(masterPlaylistPath))
         {
-            video.HlsMasterPlaylistPath = masterPlaylistPath;
+            video.HlsMasterPlaylistPath = Path.GetRelativePath(_storage.Root, masterPlaylistPath);
             video.Status = VideoStatus.Ready;
             await _videoRepository.UpdateAsync(video);
         }

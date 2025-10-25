@@ -5,6 +5,7 @@ namespace VideoStream.Application.Interfaces;
 
 public interface IFileStorageService
 {
+    string Root { get; }
     Task<string> SaveSubtitleAsync(int videoId, string language, Stream content);
     Task<string> SaveVideoAsync(int videoId, string fileName, Stream content);
 }

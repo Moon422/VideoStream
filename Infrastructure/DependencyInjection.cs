@@ -1,6 +1,4 @@
 using System;
-using Microsoft.Extensions.Azure;
-using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +11,7 @@ using VideoStream.Infrastructure.Events;
 using VideoStream.Infrastructure.Pagination;
 using VideoStream.Infrastructure.Services;
 using VideoStream.Infrastructure.Storage;
+using System.IO;
 
 namespace VideoStream.Infrastructure;
 
@@ -48,12 +47,19 @@ public static class DependencyInjection
         services.AddScoped<IEventPublisher, EventPublisher>();
 
         // Storage
-        services.AddAzureClients(clientBuilder =>
+        services.AddSingleton<IFileStorageService, LocalFileStorageService>(sp =>
         {
-            clientBuilder.AddBlobServiceClient(configuration.GetConnectionString("AzureBlobStorage"));
+            var storageRoot = configuration["Storage:Root"] ?? Path.Combine(AppContext.BaseDirectory, "storage");
+            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LocalFileStorageService>>();
+            return new LocalFileStorageService(logger, storageRoot);
         });
 
-        services.AddSingleton<IFileStorageService, AzureFileStorageService>();
+        // services.AddAzureClients(clientBuilder =>
+        // {
+        //     clientBuilder.AddBlobServiceClient(configuration.GetConnectionString("AzureBlobStorage"));
+        // });
+
+        // services.AddSingleton<IFileStorageService, AzureFileStorageService>();
 
         // Services
         services.AddScoped<IVideoProcessingService, VideoProcessingService>();

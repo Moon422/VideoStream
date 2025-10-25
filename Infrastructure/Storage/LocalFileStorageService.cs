@@ -17,11 +17,13 @@ public class LocalFileStorageService : IFileStorageService
         Directory.CreateDirectory(_root);
     }
 
+    public string Root => _root;
+
     public async Task<string> SaveVideoAsync(int videoId, string fileName, Stream content)
     {
-        var dir = Path.Combine(_root, "videos", videoId.ToString());
+        var dir = Path.Join(_root, "videos", videoId.ToString());
         Directory.CreateDirectory(dir);
-        var path = Path.Combine(dir, fileName);
+        var path = Path.Join(dir, fileName);
         using (var fs = File.Create(path))
         {
             await content.CopyToAsync(fs);
@@ -32,9 +34,9 @@ public class LocalFileStorageService : IFileStorageService
 
     public async Task<string> SaveSubtitleAsync(int videoId, string language, Stream content)
     {
-        var dir = Path.Combine(_root, "videos", videoId.ToString(), "subtitles");
+        var dir = Path.Join(_root, "videos", videoId.ToString(), "subtitles");
         Directory.CreateDirectory(dir);
-        var path = Path.Combine(dir, $"{language}.vtt");
+        var path = Path.Join(dir, $"{language}.vtt");
         using (var fs = File.Create(path))
         {
             await content.CopyToAsync(fs);

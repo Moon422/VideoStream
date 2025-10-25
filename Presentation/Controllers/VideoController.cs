@@ -65,8 +65,8 @@ public class VideoController : ControllerBase
     }
 
     [HttpPost("{id:int}/upload")]
-    // [RequestFormLimits(MultipartBodyLengthLimit = 100_000_000_000_000)]
-    [DisableRequestSizeLimit]
+    [RequestSizeLimit(2L * 1024 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024)]
     public async Task<IActionResult> UploadVideo(int id, IFormFile formFile)
     {
         if (formFile is null || formFile.Length <= 0)
